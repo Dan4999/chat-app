@@ -4,13 +4,12 @@ const http = require('http');
 const socketIo = require('socket.io');
 require('dotenv').config();
 
-// COMENTA la conexión a DB para evitar errores en Render
 // console.log('Cargando db.js...');
 // const db = require('./db');
 // console.log('db.js cargado');
 
-// Si usas authRoutes, déjala, pero si no, coméntala
-// const authRoutes = require('./routes/auth');
+
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -44,8 +43,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// COMENTA las rutas de autenticación si no funcionan
-// app.use('/api/auth', authRoutes);
+
+app.use('/api/auth', authRoutes);
 
 //  BORRA O COMENTA ESTA RUTA DUPLICADA (la que hace consulta a DB)
 // // Ruta de prueba
@@ -156,4 +155,5 @@ server.listen(PORT, () => {
     console.log(`🔗 WebSocket: ws://localhost:${PORT}`);
     console.log(`📡 Socket.io listo para conexiones`);
     console.log(`=========================================\n`);
+
 });
