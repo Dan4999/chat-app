@@ -1,6 +1,6 @@
 class Auth {
     constructor() {
-        this.baseUrl = 'http://localhost:3000/api/auth';
+        this.baseUrl = '/api/auth';
         this.initEventListeners();
     }
 
@@ -101,4 +101,5 @@ class Auth {
 
 document.addEventListener('DOMContentLoaded', () => {
     new Auth();
+
 });
