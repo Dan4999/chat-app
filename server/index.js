@@ -4,9 +4,9 @@ const http = require('http');
 const socketIo = require('socket.io');
 require('dotenv').config();
 
-// console.log('Cargando db.js...');
-// const db = require('./db');
-// console.log('db.js cargado');
+console.log('Cargando db.js...');
+const db = require('./db');
+console.log('db.js cargado');
 
 
 const authRoutes = require('./routes/auth');
@@ -157,3 +157,4 @@ server.listen(PORT, () => {
     console.log(`=========================================\n`);
 
 });
+
