@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat en Tiempo Real</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #0099cc;
+            --secondary: #ff4081;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --light: #f0f0f0;
+            --gray: #2a2a2a;
+            --gray-light: #3a3a3a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar - Usuarios conectados */
+        .sidebar {
+            width: 300px;
+            background: rgba(20, 20, 20, 0.9);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-info {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 20px;
+        }
+
+        .user-info h3 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .user-info .status {
+            color: #00ff88;
+            font-size: 0.9rem;
+        }
+
+        .users-list h4 {
+            margin-bottom: 15px;
+            color: var(--light);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: var(--gray);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-item:hover {
+            background: var(--gray-light);
+            transform: translateX(5px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .user-name {
+            flex-grow: 1;
+        }
+
+        .user-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff88;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            padding: 15px;
+            background: rgba(255, 64, 129, 0.2);
+            border: 1px solid var(--secondary);
+            color: var(--light);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 64, 129, 0.4);
+        }
+
+        /* Área de chat principal */
+        .chat-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .chat-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 20px;
+        }
+
+        .chat-header h1 {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .chat-header p {
+            color: #888;
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(20, 20, 20, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--gray);
+            border-radius: 10px;
+            max-width: 70%;
+            animation: fadeIn 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .message.own {
+            margin-left: auto;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        }
+
+        .message.system {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+        }
+
+        .message.private {
+            border-left: 4px solid #9c27b0;
+            background: rgba(156, 39, 176, 0.1);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .message.own .message-sender {
+            color: white;
+        }
+
+        .message.system .message-sender {
+            color: #ffc107;
+        }
+
+        .message.private .message-sender {
+            color: #9c27b0;
+        }
+
+        .message-time {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .message-content {
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .message-link {
+            color: var(--primary);
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .mention {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex-grow: 1;
+            padding: 15px;
+            background: var(--gray);
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+
+        .send-btn {
+            padding: 0 30px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
+        }
+
+        .typing-indicator {
+            padding: 10px 15px;
+            color: #888;
+            font-style: italic;
+            font-size: 0.9rem;
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+            max-width: fit-content;
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { 
+                opacity: 0.5; 
+            }
+            50% { 
+                opacity: 1; 
+            }
+        }
+
+        /* Scrollbar personalizada */
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: var(--gray);
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                overflow-y: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar - Usuarios -->
+        <div class="sidebar">
+            <div class="user-info">
+                <h3 id="currentUsername">Usuario</h3>
+                <div class="status">● En línea</div>
+            </div>
+
+            <div class="users-list">
+                <h4>Usuarios Conectados (<span id="onlineCount">0</span>)</h4>
+                <div id="usersList">
+                    <!-- Usuarios se cargarán aquí -->
+                </div>
+            </div>
+
+            <div class="logout-btn" id="logoutBtn">
+                Cerrar Sesión
+            </div>
+        </div>
+
+        <!-- Área de chat principal -->
+        <div class="chat-main">
+            <div class="chat-header">
+                <h1>CHAT EN TIEMPO REAL</h1>
+                <p>Conectado al servidor</p>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <!-- Mensajes aparecerán aquí -->
+                <div class="message system">
+                    <div class="message-header">
+                        <span class="message-sender">Sistema</span>
+                        <span class="message-time">Ahora</span>
+                    </div>
+                    <div class="message-content">
+                        ¡Bienvenido al chat! Los mensajes aparecerán aquí.
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <input type="text" 
+                       class="message-input" 
+                       id="messageInput" 
+                       placeholder="Escribe tu mensaje..."
+                       maxlength="500">
+                <button class="send-btn" id="sendBtn">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.io desde CDN -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>
