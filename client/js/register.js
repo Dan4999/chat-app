@@ -1,6 +1,6 @@
 class Register {
     constructor() {
-        this.baseUrl = 'http://localhost:3000/api/auth';
+        this.baseUrl = '/api/auth';
         this.initEventListeners();
         this.initPasswordStrength();
     }
@@ -191,4 +191,5 @@ class Register {
 
 document.addEventListener('DOMContentLoaded', () => {
     new Register();
+
 });
