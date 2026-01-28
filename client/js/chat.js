@@ -23,7 +23,7 @@ class Chat {
     }
 
     connectSocket() {
-        this.socket = io('http://localhost:3000', {
+        this.socket = io({
             transports: ['websocket', 'polling']
         });
 
@@ -151,7 +151,7 @@ class Chat {
     async logout() {
         if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
             try {
-                await fetch('http://localhost:3000/api/auth/logout', {
+                await fetch('/api/auth/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: this.currentUser.id })
@@ -170,4 +170,5 @@ class Chat {
 
 document.addEventListener('DOMContentLoaded', () => {
     new Chat();
+
 });
