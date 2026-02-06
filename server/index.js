@@ -46,7 +46,6 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 
-//  BORRA O COMENTA ESTA RUTA DUPLICADA (la que hace consulta a DB)
 // // Ruta de prueba
 // app.get('/', async (req, res) => {
 //     try {
@@ -157,4 +156,5 @@ server.listen(PORT, () => {
     console.log(`=========================================\n`);
 
 });
+
 
